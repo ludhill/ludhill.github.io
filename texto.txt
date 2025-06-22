@@ -140,3 +140,333 @@ dados.json
     {"id": 6, "nome": "Nível a Laser"}
   ]
 }
+
+
+
+
+
+################
+
+
+
+
+
+
+{
+  "procedimentos": [
+    { "id": "procA", "nome": "Procedimento A - Inspeção", "ferramentas_ids": [1, 2, 3] },
+    { "id": "procB", "nome": "Procedimento B - Reparo Elétrico", "ferramentas_ids": [2, 4, 6] },
+    { "id": "procC", "nome": "Procedimento C - Montagem Mecânica", "ferramentas_ids": [1, 3, 5] }
+  ],
+  "ferramentas": [
+    { "id": 1, "nome": "Martelo" },
+    { "id": 2, "nome": "Chave de Fenda" },
+    { "id": 3, "nome": "Trena" },
+    { "id": 4, "nome": "Alicate" },
+    { "id": 5, "nome": "Parafusadeira" },
+    { "id": 6, "nome": "Multímetro" }
+  ],
+  "ferramentas_na_matriz_indices": {
+    "Martelo": { "row": 0, "col": 0 },
+    "Chave de Fenda": { "row": 0, "col": 1 },
+    "Trena": { "row": 0, "col": 2 },
+    "Alicate": { "row": 0, "col": 3 },
+    "Parafusadeira": { "row": 0, "col": 4 },
+    "Multímetro": { "row": 0, "col": 5 }
+  }
+}
+
+
+
+
+
+
+################
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Procedimentos e Ferramentas - Destaque em Matriz</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f8f8f8; color: #333; display: flex; gap: 20px; }
+        .container { flex: 1; background-color: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
+
+        /* Estilos para a lista de procedimentos */
+        #procedimentoList {
+            width: 300px;
+            background-color: #e6f7ff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+        }
+        #procedimentoList h2 { margin-top: 0; color: #0056b3; }
+        #procedimentoList ul { list-style: none; padding: 0; }
+        #procedimentoList li {
+            margin-bottom: 8px;
+            cursor: pointer;
+            padding: 10px 15px;
+            background-color: #cceeff;
+            border-radius: 5px;
+            transition: background-color 0.2s ease;
+        }
+        #procedimentoList li:hover { background-color: #99ddff; }
+        #procedimentoList li.selected-procedure {
+            background-color: #007bff;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0, 123, 255, 0.3);
+        }
+
+        /* Estilos para a tabela */
+        #ferramentaMatrix table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        #ferramentaMatrix th, #ferramentaMatrix td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+            vertical-align: middle;
+        }
+        #ferramentaMatrix thead th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+            color: #555;
+        }
+        #ferramentaMatrix tbody tr:nth-child(even) { background-color: #f9f9f9; }
+        #ferramentaMatrix tbody tr:hover { background-color: #f1f1f1; }
+
+        /* Estilo para a célula destacada */
+        .highlighted-tool {
+            background-color: #ffeb3b !important; /* Amarelo, !important para sobrescrever outros estilos */
+            font-weight: bold;
+            box-shadow: 0 0 8px rgba(255, 235, 59, 0.7);
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="procedimentoList" class="container">
+        <h2>Selecione um Procedimento:</h2>
+        <ul id="procedureItems">
+            <li>Carregando procedimentos...</li>
+        </ul>
+    </div>
+
+    <div class="container">
+        <h1>Matriz de Ferramentas por Procedimento</h1>
+        <div id="ferramentaMatrix">
+            <p>Carregando tabela de ferramentas...</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Ferramenta 1</th>
+                        <th>Ferramenta 2</th>
+                        <th>Ferramenta 3</th>
+                        <th>Ferramenta 4</th>
+                        <th>Ferramenta 5</th>
+                        <th>Ferramenta 6</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr data-procedure-id="procA">
+                        <td id="tool-1-procA">X</td> <td id="tool-2-procA">X</td>
+                        <td id="tool-3-procA">X</td>
+                        <td id="tool-4-procA"></td>
+                        <td id="tool-5-procA"></td>
+                        <td id="tool-6-procA"></td>
+                    </tr>
+                    <tr data-procedure-id="procB">
+                        <td id="tool-1-procB"></td>
+                        <td id="tool-2-procB">X</td>
+                        <td id="tool-3-procB"></td>
+                        <td id="tool-4-procB">X</td>
+                        <td id="tool-5-procB"></td>
+                        <td id="tool-6-procB">X</td>
+                    </tr>
+                    <tr data-procedure-id="procC">
+                        <td id="tool-1-procC">X</td>
+                        <td id="tool-2-procC"></td>
+                        <td id="tool-3-procC">X</td>
+                        <td id="tool-4-procC"></td>
+                        <td id="tool-5-procC">X</td>
+                        <td id="tool-6-procC"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let allData = {}; // Objeto para armazenar os dados do JSON
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                // Carrega o JSON
+                const response = await fetch('dados.json');
+                if (!response.ok) {
+                    throw new Error(`Erro ao carregar dados: ${response.statusText}`);
+                }
+                allData = await response.json();
+
+                renderProceduresList(allData.procedimentos);
+                // A tabela já está no HTML, mas você poderia construí-la dinamicamente aqui também
+                // renderFerramentaMatrix(allData.procedimentos, allData.ferramentas);
+
+            } catch (error) {
+                console.error('Erro ao inicializar:', error);
+                document.getElementById('procedureItems').innerHTML = '<li>Erro ao carregar dados.</li>';
+                document.getElementById('ferramentaMatrix').innerHTML = '<p>Erro ao carregar tabela.</p>';
+            }
+        });
+
+        function renderProceduresList(procedimentos) {
+            const procedureItemsUl = document.getElementById('procedureItems');
+            procedureItemsUl.innerHTML = ''; // Limpa o "Carregando..."
+
+            procedimentos.forEach(proc => {
+                const li = document.createElement('li');
+                li.textContent = proc.nome;
+                li.dataset.procedureId = proc.id; // Armazena o ID do procedimento no elemento
+                li.addEventListener('click', () => selectProcedure(proc.id));
+                procedureItemsUl.appendChild(li);
+            });
+        }
+
+        function selectProcedure(procedureId) {
+            // 1. Desselecionar procedimento anterior na lista
+            const currentSelected = document.querySelector('#procedimentoList li.selected-procedure');
+            if (currentSelected) {
+                currentSelected.classList.remove('selected-procedure');
+            }
+            // Selecionar o novo procedimento na lista
+            const newSelected = document.querySelector(`#procedimentoList li[data-procedure-id="${procedureId}"]`);
+            if (newSelected) {
+                newSelected.classList.add('selected-procedure');
+            }
+
+            // 2. Limpar todos os destaques existentes na tabela
+            const highlightedCells = document.querySelectorAll('.highlighted-tool');
+            highlightedCells.forEach(cell => {
+                cell.classList.remove('highlighted-tool');
+            });
+
+            // 3. Encontrar o procedimento selecionado no JSON
+            const selectedProcedure = allData.procedimentos.find(p => p.id === procedureId);
+
+            if (selectedProcedure) {
+                // 4. Obter os IDs das ferramentas para este procedimento
+                const toolsToHighlightIds = selectedProcedure.ferramentas_ids;
+
+                // 5. Destacar as células correspondentes na tabela
+                toolsToHighlightIds.forEach(toolId => {
+                    // Encontra o nome da ferramenta pelo ID
+                    const toolName = allData.ferramentas.find(f => f.id === toolId)?.nome;
+
+                    if (toolName && allData.ferramentas_na_matriz_indices[toolName]) {
+                        // Exemplo 1: Se as células da tabela tiverem IDs específicos
+                        // Como no meu HTML de exemplo: id="tool-IDDAFERRAMENTA-IDDOPROCEDIMENTO"
+                        const cellId = `tool-${toolId}-${procedureId}`;
+                        const cell = document.getElementById(cellId);
+                        if (cell) {
+                            cell.classList.add('highlighted-tool');
+                        }
+
+                        // Exemplo 2: Se você quer destacar apenas a CÉLULA DO CABEÇALHO da ferramenta
+                        // const toolIndex = allData.ferramentas_na_matriz_indices[toolName].col;
+                        // const headerRow = document.querySelector('#ferramentaMatrix thead tr');
+                        // if (headerRow) {
+                        //     const headerCell = headerRow.children[toolIndex];
+                        //     if (headerCell) {
+                        //         headerCell.classList.add('highlighted-tool');
+                        //     }
+                        // }
+                    }
+                });
+            }
+        }
+
+        // --- Funções Auxiliares (se você fosse construir a tabela dinamicamente) ---
+        // function renderFerramentaMatrix(procedimentos, ferramentas) {
+        //     const matrixDiv = document.getElementById('ferramentaMatrix');
+        //     let tableHtml = '<table><thead><tr><th>Procedimento / Ferramenta</th>';
+        //     ferramentas.forEach(f => {
+        //         tableHtml += `<th data-tool-id="${f.id}">${f.nome}</th>`;
+        //     });
+        //     tableHtml += '</tr></thead><tbody>';
+
+        //     procedimentos.forEach(proc => {
+        //         tableHtml += `<tr data-procedure-id="${proc.id}"><td>${proc.nome}</td>`;
+        //         ferramentas.forEach(f => {
+        //             const usesTool = proc.ferramentas_ids.includes(f.id);
+        //             // Dando IDs únicos para as células facilita a seleção
+        //             tableHtml += `<td id="cell-proc-${proc.id}-tool-${f.id}">${usesTool ? 'X' : ''}</td>`;
+        //         });
+        //         tableHtml += '</tr>';
+        //     });
+        //     tableHtml += '</tbody></table>';
+        //     matrixDiv.innerHTML = tableHtml;
+        // }
+    </script>
+</body>
+</html>
+
+
+
+
+
+################
+
+
+
+
+// Exemplo de como você pode tentar mapear as células de uma tabela existente
+// Supondo que a PRIMEIRA LINHA da sua tabela contenha os NOMES das ferramentas
+// E que você tenha os PROCEDIMENTOS NAS LINHAS e as FERRAMENTAS NAS COLUNAS
+function mapToolsToTableCells(tableElement, allData) {
+    const headerRow = tableElement.querySelector('thead tr') || tableElement.querySelector('tbody tr:first-child');
+    const toolNamesInHeader = Array.from(headerRow.children).map(th => th.textContent.trim());
+
+    const newToolIndices = {};
+    allData.ferramentas.forEach(tool => {
+        const index = toolNamesInHeader.indexOf(tool.nome);
+        if (index !== -1) {
+            newToolIndices[tool.nome] = { row: 0, col: index }; // 'row: 0' porque é o cabeçalho
+        }
+    });
+    allData.ferramentas_na_matriz_indices = newToolIndices;
+
+    // Agora você precisa dar um jeito de identificar as células de 'X' ou 'Vazio'
+    // A forma mais robusta é dar um ID para cada célula que representa uma ferramenta em um procedimento
+    const tbody = tableElement.querySelector('tbody');
+    if (tbody) {
+        Array.from(tbody.rows).forEach(row => {
+            const procedureName = row.cells[0].textContent.trim(); // Assumindo o nome do procedimento na primeira coluna
+            const procedure = allData.procedimentos.find(p => p.nome === procedureName);
+            if (procedure) {
+                Array.from(row.cells).forEach((cell, colIndex) => {
+                    const toolNameInCol = toolNamesInHeader[colIndex - 1]; // -1 se a primeira coluna for o procedimento
+                    const tool = allData.ferramentas.find(f => f.nome === toolNameInCol);
+                    if (tool) {
+                        // Damos um ID à célula para que possamos selecioná-la facilmente depois
+                        cell.id = `tool-cell-${tool.id}-${procedure.id}`;
+                        // Também podemos adicionar um data-attribute para o ID da ferramenta na célula
+                        cell.dataset.toolId = tool.id;
+                        cell.dataset.procedureId = procedure.id;
+                    }
+                });
+            }
+        });
+    }
+}
+
+// Chamar isso depois de carregar o JSON e antes de renderizar os procedimentos
+// mapToolsToTableCells(document.querySelector('#ferramentaMatrix table'), allData);
